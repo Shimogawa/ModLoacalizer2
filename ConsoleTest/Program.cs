@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,6 @@ namespace ConsoleTest
 
 //			file.ReplaceFile("Windows.dll", new byte[0]);
 //			file.Save("test2.tmod");
-
 
 			Console.Read();
 		}

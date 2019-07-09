@@ -113,6 +113,16 @@ namespace ModLocalizer2.ModLoader.Core
 			return result;
 		}
 
+		public byte[] GetTrueBytes(string fileName)
+		{
+			FileEntry entry;
+			if (!files.TryGetValue(Sanitize(fileName), out entry))
+			{
+				return null;
+			}
+			return GetTrueBytes(entry);
+		}
+
 		public byte[] GetTrueBytes(FileEntry entry)
 		{
 			if (!entry.IsCompressed)
@@ -170,11 +180,11 @@ namespace ModLocalizer2.ModLoader.Core
 			byte[] data;
 			if (monoOnly)
 			{
-				data = GetRawBytes("Mono.dll");
+				data = GetTrueBytes("Mono.dll");
 			}
 			else
 			{
-				data = HasFile("All.dll") ? GetRawBytes("All.dll") : GetRawBytes("Windows.dll");
+				data = GetTrueBytes("Windows.dll");
 			}
 			return data;
 		}
@@ -198,7 +208,9 @@ namespace ModLocalizer2.ModLoader.Core
 			}
 			
 			string n = string.IsNullOrEmpty(newName) ? fileName : newName;
-			files[fileName] = new FileEntry(n, -1, originLen, data.Length);
+			var e = new FileEntry(n, -1, originLen, data.Length);
+			e.OriginalData = data;
+			files[fileName] = e;
 			fileTable = null;
 		}
 
