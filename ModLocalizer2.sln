@@ -5,6 +5,13 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModLocalizer2", "ModLocalizer2\ModLocalizer2.csproj", "{CFA18F48-59CF-49D1-9A8B-DE9D79698788}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTest", "ConsoleTest\ConsoleTest.csproj", "{A5836B66-0F16-4582-AB13-AD5D6173CE09}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{62F7588B-645F-45C5-847B-6A7A1363F999}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +22,10 @@ Global
 		{CFA18F48-59CF-49D1-9A8B-DE9D79698788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFA18F48-59CF-49D1-9A8B-DE9D79698788}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFA18F48-59CF-49D1-9A8B-DE9D79698788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5836B66-0F16-4582-AB13-AD5D6173CE09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5836B66-0F16-4582-AB13-AD5D6173CE09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5836B66-0F16-4582-AB13-AD5D6173CE09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5836B66-0F16-4582-AB13-AD5D6173CE09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
