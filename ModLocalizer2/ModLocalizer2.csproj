@@ -38,12 +38,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultConfig.cs" />
-    <Compile Include="ModLoader\Core\BuildProperties.cs" />
-    <Compile Include="ModLoader\Core\EntryReadStream.cs" />
-    <Compile Include="ModLoader\Core\TmodFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

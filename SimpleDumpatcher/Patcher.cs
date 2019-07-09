@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ModLocalizer2.ModLoader.Core;
+using ModFileCore.ModLoader.Core;
 
 namespace SimpleDumpatcher
 {

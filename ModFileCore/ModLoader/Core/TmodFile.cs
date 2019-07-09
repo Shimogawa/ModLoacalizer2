@@ -5,10 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using Ionic.Zlib;
 
-namespace ModLocalizer2.ModLoader.Core
+namespace ModFileCore.ModLoader.Core
 {
 	public class TmodFile : IEnumerable<KeyValuePair<string, TmodFile.FileEntry>>
 	{

@@ -52,9 +52,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ModLocalizer2\ModLocalizer2.csproj">
-      <Project>{cfa18f48-59cf-49d1-9a8b-de9d79698788}</Project>
-      <Name>ModLocalizer2</Name>
+    <ProjectReference Include="..\ModFileCore\ModFileCore.csproj">
+      <Project>{ca6df18b-16f9-4fab-ae62-6b614873dfd3}</Project>
+      <Name>ModFileCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

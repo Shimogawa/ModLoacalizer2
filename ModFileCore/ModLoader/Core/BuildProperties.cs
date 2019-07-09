@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ModLocalizer2.ModLoader.Core
+namespace ModFileCore.ModLoader.Core
 {
 	internal class BuildProperties
 	{
