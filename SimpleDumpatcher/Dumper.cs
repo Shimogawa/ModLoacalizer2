@@ -31,6 +31,8 @@ namespace SimpleDumpatcher
 			{
 				data = tmf.GetPrimaryAssembly(false);
 			}
+			if (data == null)
+				throw new Exception("未找到dll");
 			File.WriteAllBytes(o, data);
 		}
 	}

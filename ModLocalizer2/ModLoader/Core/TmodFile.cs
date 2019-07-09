@@ -83,10 +83,6 @@ namespace ModLocalizer2.ModLoader.Core
 			{
 				throw new Exception(string.Format("Missing {0} file", "Info"));
 			}
-			if (!this.HasFile("All.dll") && (!this.HasFile("Windows.dll") || !this.HasFile("Mono.dll")))
-			{
-				throw new Exception(string.Format("Missing {0} or {1} and {2}", "All.dll", "Windows.dll", "Mono.dll"));
-			}
 		}
 
 		public byte[] GetRawBytes(string fileName)
@@ -185,6 +181,14 @@ namespace ModLocalizer2.ModLoader.Core
 			else
 			{
 				data = GetTrueBytes("Windows.dll");
+			}
+
+			if (data == null)
+			{
+				var f = files.Where(kvp => kvp.Key.EndsWith(".XNA.dll")).ToList();
+				if (f.Count < 1)
+					return null;
+				data = GetTrueBytes(f[0].Value);
 			}
 			return data;
 		}

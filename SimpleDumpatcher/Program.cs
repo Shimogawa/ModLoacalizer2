@@ -11,28 +11,28 @@ namespace SimpleDumpatcher
 		static void Main(string[] args)
 		{
 			Console.WriteLine("1——拆dll，2——插入dll");
-			try
+//			try
+//			{
+			int p = int.Parse(Console.ReadLine());
+			if (p == 1)
 			{
-				int p = int.Parse(Console.ReadLine());
-				if (p == 1)
-				{
-					GetDumper().Dump();
-				}
-				else if (p == 2)
-				{
-					GetPatcher().Patch();
-				}
-				else
-				{
-					throw new Exception("选项错误");
-				}
-				Console.WriteLine("完成。");
+				GetDumper().Dump();
 			}
-			catch (Exception e)
+			else if (p == 2)
 			{
-				Console.Error.WriteLine(e.Message);
-				Console.Error.WriteLine(e.StackTrace);
+				GetPatcher().Patch();
 			}
+			else
+			{
+				throw new Exception("选项错误");
+			}
+			Console.WriteLine("完成。");
+//			}
+//			catch (Exception e)
+//			{
+//				Console.Error.WriteLine(e.Message);
+//				Console.Error.WriteLine(e.StackTrace);
+//			}
 			Console.ReadLine();
 		}
 
