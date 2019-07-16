@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleDumpatcher", "SimpleD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModFileCore", "ModFileCore\ModFileCore.csproj", "{CA6DF18B-16F9-4FAB-AE62-6B614873DFD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModUpDowngrader", "ModUpDowngrader\ModUpDowngrader.csproj", "{1D6F0965-7CBA-4A58-8442-5FA2FFBAC4DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{CA6DF18B-16F9-4FAB-AE62-6B614873DFD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA6DF18B-16F9-4FAB-AE62-6B614873DFD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA6DF18B-16F9-4FAB-AE62-6B614873DFD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D6F0965-7CBA-4A58-8442-5FA2FFBAC4DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D6F0965-7CBA-4A58-8442-5FA2FFBAC4DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D6F0965-7CBA-4A58-8442-5FA2FFBAC4DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D6F0965-7CBA-4A58-8442-5FA2FFBAC4DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

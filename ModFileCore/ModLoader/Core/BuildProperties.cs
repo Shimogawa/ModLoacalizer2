@@ -4,13 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace ModFileCore.ModLoader.Core
 {
-	internal class BuildProperties
+	[JsonObject(MemberSerialization.Fields)]
+	public class BuildProperties
 	{
 		// Token: 0x06001992 RID: 6546 RVA: 0x004143DC File Offset: 0x004125DC
-		public IEnumerable<BuildProperties.ModReference> Refs(bool includeWeak)
+		public IEnumerable<ModReference> Refs(bool includeWeak)
 		{
 			if (!includeWeak)
 			{
@@ -61,35 +63,34 @@ namespace ModFileCore.ModLoader.Core
 			writer.Write("");
 		}
 
-		// Token: 0x06001998 RID: 6552 RVA: 0x00414B40 File Offset: 0x00412D40
-		internal byte[] ToBytes()
+		public byte[] ToBytes()
 		{
 			byte[] result;
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
 				{
-					if (this.dllReferences.Length != 0)
+					if (dllReferences.Length != 0)
 					{
 						binaryWriter.Write("dllReferences");
 						BuildProperties.WriteList<string>(this.dllReferences, binaryWriter);
 					}
-					if (this.modReferences.Length != 0)
+					if (modReferences.Length != 0)
 					{
 						binaryWriter.Write("modReferences");
 						BuildProperties.WriteList<BuildProperties.ModReference>(this.modReferences, binaryWriter);
 					}
-					if (this.weakReferences.Length != 0)
+					if (weakReferences.Length != 0)
 					{
 						binaryWriter.Write("weakReferences");
 						BuildProperties.WriteList<BuildProperties.ModReference>(this.weakReferences, binaryWriter);
 					}
-					if (this.sortAfter.Length != 0)
+					if (sortAfter.Length != 0)
 					{
 						binaryWriter.Write("sortAfter");
 						BuildProperties.WriteList<string>(this.sortAfter, binaryWriter);
 					}
-					if (this.sortBefore.Length != 0)
+					if (sortBefore.Length != 0)
 					{
 						binaryWriter.Write("sortBefore");
 						BuildProperties.WriteList<string>(this.sortBefore, binaryWriter);
@@ -155,6 +156,14 @@ namespace ModFileCore.ModLoader.Core
 			return result;
 		}
 
+		public static BuildProperties ReadFromModFile(TmodFile file)
+		{
+			using (var ms = new MemoryStream(file.GetTrueBytes(TConstants.InfoFileName)))
+			{
+				return ReadFromStream(ms);
+			}
+		}
+
 //		// Token: 0x06001999 RID: 6553 RVA: 0x00414DDC File Offset: 0x00412FDC
 //		internal static BuildProperties ReadModFile(TmodFile modFile)
 //		{
@@ -162,7 +171,7 @@ namespace ModFileCore.ModLoader.Core
 //		}
 
 		// Token: 0x0600199A RID: 6554 RVA: 0x00414DF0 File Offset: 0x00412FF0
-		internal static BuildProperties ReadFromStream(Stream stream)
+		public static BuildProperties ReadFromStream(Stream stream)
 		{
 			BuildProperties buildProperties = new BuildProperties();
 			using (BinaryReader binaryReader = new BinaryReader(stream))
@@ -253,7 +262,7 @@ namespace ModFileCore.ModLoader.Core
 		}
 
 		// Token: 0x0600199B RID: 6555 RVA: 0x00415054 File Offset: 0x00413254
-		internal static void InfoToBuildTxt(Stream src, Stream dst)
+		public static void InfoToBuildTxt(Stream src, Stream dst)
 		{
 			BuildProperties buildProperties = BuildProperties.ReadFromStream(src);
 			StringBuilder stringBuilder = new StringBuilder();
@@ -391,7 +400,7 @@ namespace ModFileCore.ModLoader.Core
 		internal ModReference.ModSide side;
 
 		// Token: 0x020004A6 RID: 1190
-		internal struct ModReference
+		public struct ModReference
 		{
 			// Token: 0x06002980 RID: 10624 RVA: 0x004902EE File Offset: 0x0048E4EE
 			public ModReference(string mod, Version target)

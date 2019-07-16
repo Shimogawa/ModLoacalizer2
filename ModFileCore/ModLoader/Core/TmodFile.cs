@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Security.Cryptography;
 using System.Text;
+using Ionic.Zlib;
 
 namespace ModFileCore.ModLoader.Core
 {
@@ -14,7 +16,9 @@ namespace ModFileCore.ModLoader.Core
 
 		public Version Version { get; set; }
 
-		public int FileCount => fileTable.Length;
+		public int FileCount => fileTable?.Length ?? files.Count;
+
+		public bool IsCompiledWithNewModLoader => !(files.ContainsKey("Mono.dll") || files.ContainsKey("Windows.dll"));
 
 		private readonly string path;
 		private readonly IDictionary<string, FileEntry> files = new Dictionary<string, FileEntry>();
@@ -34,12 +38,33 @@ namespace ModFileCore.ModLoader.Core
 
 		internal void Read()
 		{
+			bool isOld = false;
+			using (var fs = File.OpenRead(path))
+			using (var br = new BinaryReader(fs))
+			{
+				if (Encoding.ASCII.GetString(br.ReadBytes(4)) != TConstants.MagicHeader)
+				{
+					throw new Exception($"Magic Header != \"{TConstants.MagicHeader}\"");
+				}
+				fileMLVersion = new Version(br.ReadString());
+				if (fileMLVersion < TConstants.NewTmodVersion)
+				{
+					isOld = true;
+				}
+			}
+
+			if (isOld)
+			{
+				ReadLegacy();
+				return;
+			}
+
 			fileStream = File.OpenRead(path);
 			using (BinaryReader reader = new BinaryReader(fileStream))
 			{
-				if (Encoding.ASCII.GetString(reader.ReadBytes(4)) != "TMOD")
+				if (Encoding.ASCII.GetString(reader.ReadBytes(4)) != TConstants.MagicHeader)
 				{
-					throw new Exception($"Magic Header != \"TMOD\"");
+					throw new Exception($"Magic Header != \"{TConstants.MagicHeader}\"");
 				}
 				fileMLVersion = new Version(reader.ReadString());
 				hash = reader.ReadBytes(20);
@@ -77,9 +102,53 @@ namespace ModFileCore.ModLoader.Core
 				}
 			}
 
-			if (!this.HasFile("Info"))
+			if (!this.HasFile(TConstants.InfoFileName))
+			{
+				throw new Exception(string.Format("Missing {0} file", TConstants.InfoFileName));
+			}
+		}
+
+		public void ReadLegacy()
+		{
+			byte[] data;
+			using (var fs = File.OpenRead(path))
+			using (var br = new BinaryReader(fs))
+			{
+				br.ReadBytes(4);
+				fileMLVersion = new Version(br.ReadString());
+				hash = br.ReadBytes(20);
+				signature = br.ReadBytes(256);
+				data = br.ReadBytes(br.ReadInt32());
+				if (!SHA1.Create().ComputeHash(data).SequenceEqual(hash))
+				{
+					throw new Exception("Hash mismatch, data blob has been modified or corrupted");
+				}
+			}
+
+			using (var ms = new MemoryStream(data))
+			using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
+			using (var br = new BinaryReader(ds))
+			{
+				Name = br.ReadString();
+				Version = new Version(br.ReadString());
+				int count = br.ReadInt32();
+				for (int i = 0; i < count; i++)
+				{
+					string name = br.ReadString();
+					byte[] f = br.ReadBytes(br.ReadInt32());
+					var fe = new FileEntry(name, -1, f.Length, f.Length);
+					fe.OriginalData = f;
+					files.Add(name, fe);
+				}
+			}
+
+			if (!HasFile("Info"))
 			{
 				throw new Exception(string.Format("Missing {0} file", "Info"));
+			}
+			if (!this.HasFile("All.dll") && (!this.HasFile("Windows.dll") || !this.HasFile("Mono.dll")))
+			{
+				throw new Exception(string.Format("Missing {0} or {1} and {2}", "All.dll", "Windows.dll", "Mono.dll"));
 			}
 		}
 
@@ -93,6 +162,11 @@ namespace ModFileCore.ModLoader.Core
 			return GetRawBytes(entry);
 		}
 
+		/// <summary>
+		/// Get the compressed bytes (if it is compressed)
+		/// </summary>
+		/// <param name="entry"></param>
+		/// <returns></returns>
 		public byte[] GetRawBytes(FileEntry entry)
 		{
 			if (entry.OriginalData != null)
@@ -121,6 +195,15 @@ namespace ModFileCore.ModLoader.Core
 		{
 			if (!entry.IsCompressed)
 				return GetRawBytes(entry);
+			if (entry.OriginalData != null)
+			{
+				using (var ms = new MemoryStream(entry.OriginalData))
+				using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
+				{
+					return ds.ReadBytes(entry.Length);
+				}
+			}
+
 			using (Stream s = GetStream(entry))
 			using (DeflateStream ds = new DeflateStream(s, CompressionMode.Decompress))
 			{
@@ -171,24 +254,52 @@ namespace ModFileCore.ModLoader.Core
 
 		public byte[] GetPrimaryAssembly(bool monoOnly)
 		{
-			byte[] data;
-			if (monoOnly)
+			FileEntry file;
+			if (IsCompiledWithNewModLoader)
 			{
-				data = GetTrueBytes("Mono.dll");
+				if (monoOnly)
+					file = files.Single(kvp => kvp.Key.EndsWith(".FNA.dll")).Value;
+				else
+					file = files.Single(kvp => kvp.Key.EndsWith(".XNA.dll")).Value;
 			}
 			else
 			{
-				data = GetTrueBytes("Windows.dll");
+				if (monoOnly)
+				{
+					file = files["Mono.dll"];
+				}
+				else
+				{
+					file = files["Windows.dll"];
+				}
 			}
 
-			if (data == null)
+			return GetTrueBytes(file);
+		}
+
+		public void ReplacePrimaryAssembly(byte[] data, bool monoOnly)
+		{
+			string file;
+			if (IsCompiledWithNewModLoader)
 			{
-				var f = files.Where(kvp => kvp.Key.EndsWith(".XNA.dll")).ToList();
-				if (f.Count < 1)
-					return null;
-				data = GetTrueBytes(f[0].Value);
+				if (monoOnly)
+					file = files.Single(kvp => kvp.Key.EndsWith(".FNA.dll")).Key;
+				else
+					file = files.Single(kvp => kvp.Key.EndsWith(".XNA.dll")).Key;
 			}
-			return data;
+			else
+			{
+				if (monoOnly)
+				{
+					file = "Mono.dll";
+				}
+				else
+				{
+					file = "Windows.dll";
+				}
+			}
+
+			ReplaceFile(file, data);
 		}
 
 		/// <summary>
@@ -204,7 +315,7 @@ namespace ModFileCore.ModLoader.Core
 			if (!HasFile(fileName)) 
 				throw new ArgumentException("No such file.");
 			int originLen = data.Length;
-			if (data.Length > 1024 && ShouldCompress(fileName))
+			if (data.Length > 1024 && ShouldCompress(fileName) && fileMLVersion >= TConstants.NewTmodVersion)
 			{
 				data = Compress(data);
 			}
@@ -265,6 +376,12 @@ namespace ModFileCore.ModLoader.Core
 
 		public void Save(string path)
 		{
+			if (fileMLVersion < TConstants.NewTmodVersion)
+			{
+				SaveLegacy(path);
+				return;
+			}
+
 			using (FileStream fs = File.Create(path))
 			{
 				using (BinaryWriter binaryWriter = new BinaryWriter(fs))
@@ -278,6 +395,10 @@ namespace ModFileCore.ModLoader.Core
 					binaryWriter.Write(Version.ToString());
 					fileTable = files.Values.ToArray();
 					binaryWriter.Write(fileTable.Length);
+					foreach (var fe in fileTable)
+					{
+						CheckAndCompress(fe);
+					}
 					foreach (var fe in fileTable)
 					{
 						binaryWriter.Write(fe.Name);
@@ -298,6 +419,88 @@ namespace ModFileCore.ModLoader.Core
 					fs.Seek(256L, SeekOrigin.Current);
 					binaryWriter.Write((int)(fs.Length - num2));
 				}
+			}
+		}
+
+		public void SaveLegacy(string path)
+		{
+			using (var ms = new MemoryStream())
+			{
+				using (var ds = new DeflateStream(ms, CompressionMode.Compress))
+				using (var bw = new BinaryWriter(ds))
+				{
+					bw.Write(Name);
+					bw.Write(Version.ToString());
+					bw.Write(files.Count);
+					foreach (var kvp in files)
+					{
+						bw.Write(kvp.Key);
+						bw.Write(kvp.Value.OriginalData.Length);
+						bw.Write(kvp.Value.OriginalData);
+					}
+				}
+
+				byte[] data = ms.ToArray();
+				hash = SHA1.Create().ComputeHash(data);
+				using (var fs = File.Create(path))
+				using (var bw = new BinaryWriter(fs))
+				{
+					bw.Write(Encoding.ASCII.GetBytes("TMOD"));
+					bw.Write(fileMLVersion.ToString());
+					bw.Write(hash);
+					bw.Write(signature);
+					bw.Write(data.Length);
+					bw.Write(data);
+				}
+			}
+		}
+
+		public void Upgrade()
+		{
+			if (fileMLVersion >= TConstants.NewTmodVersion)
+				return;
+			fileTable = null;
+			foreach (var fe in files)
+			{
+				CheckAndCompress(fe.Value);
+			}
+
+			fileMLVersion = TConstants.NewestTmodVersion;
+			var buildProp = BuildProperties.ReadFromModFile(this);
+			buildProp.buildVersion = TConstants.NewestTmodVersion;
+			ReplaceFile(TConstants.InfoFileName, buildProp.ToBytes());
+			Close();
+		}
+
+		public void Downgrade()
+		{
+			if (fileMLVersion < TConstants.NewTmodVersion)
+				return;
+			fileTable = null;
+			foreach (var kvp in files)
+			{
+				kvp.Value.OriginalData = GetTrueBytes(kvp.Value);
+				kvp.Value.CompressedLength = kvp.Value.Length = kvp.Value.OriginalData.Length;
+				kvp.Value.Offset = -1;
+			}
+
+			fileMLVersion = TConstants.OldTmodVersion;
+			var buildProp = BuildProperties.ReadFromModFile(this);
+			if (buildProp.buildVersion >= TConstants.NewTmodVersion)
+			{
+				buildProp.buildVersion = TConstants.OldTmodVersion;
+				ReplaceFile(TConstants.InfoFileName, buildProp.ToBytes());
+			}
+
+			Close();
+		}
+
+		private void CheckAndCompress(FileEntry fe)
+		{
+			if (ShouldCompress(fe.Name) && !fe.IsCompressed)
+			{
+				fe.OriginalData = Compress(fe.OriginalData);
+				fe.CompressedLength = fe.OriginalData.Length;
 			}
 		}
 
