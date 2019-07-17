@@ -371,7 +371,7 @@ namespace ModFileCore.ModLoader.Core
 
 		internal bool Beta = false;
 
-		internal string BuildVersion = TConstants.NewestTmodVersion.ToString();
+		internal string BuildVersion = TConstants.OldTmodVersion.ToString();
 
 		internal string Homepage = "";
 
