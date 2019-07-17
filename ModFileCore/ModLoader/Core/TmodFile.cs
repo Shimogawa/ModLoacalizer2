@@ -467,7 +467,7 @@ namespace ModFileCore.ModLoader.Core
 
 			fileMLVersion = TConstants.NewestTmodVersion;
 			var buildProp = BuildProperties.ReadFromModFile(this);
-			buildProp.buildVersion = TConstants.NewestTmodVersion;
+			buildProp.BuildVersion = TConstants.NewestTmodVersion.ToString();
 			ReplaceFile(TConstants.InfoFileName, buildProp.ToBytes());
 			Close();
 		}
@@ -486,9 +486,9 @@ namespace ModFileCore.ModLoader.Core
 
 			fileMLVersion = TConstants.OldTmodVersion;
 			var buildProp = BuildProperties.ReadFromModFile(this);
-			if (buildProp.buildVersion >= TConstants.NewTmodVersion)
+			if (new Version(buildProp.BuildVersion) >= TConstants.NewTmodVersion)
 			{
-				buildProp.buildVersion = TConstants.OldTmodVersion;
+				buildProp.BuildVersion = TConstants.OldTmodVersion.ToString();
 				ReplaceFile(TConstants.InfoFileName, buildProp.ToBytes());
 			}
 

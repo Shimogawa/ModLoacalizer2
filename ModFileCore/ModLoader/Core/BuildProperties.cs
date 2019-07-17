@@ -16,16 +16,16 @@ namespace ModFileCore.ModLoader.Core
 		{
 			if (!includeWeak)
 			{
-				return this.modReferences;
+				return this.ModReferences;
 			}
-			return this.modReferences.Concat(this.weakReferences);
+			return this.ModReferences.Concat(this.WeakReferences);
 		}
 
 		// Token: 0x06001993 RID: 6547 RVA: 0x00414406 File Offset: 0x00412606
 		public IEnumerable<string> RefNames(bool includeWeak)
 		{
 			return from dep in this.Refs(includeWeak)
-				   select dep.mod;
+				   select dep.Mod;
 		}
 
 		// Token: 0x06001994 RID: 6548 RVA: 0x00414434 File Offset: 0x00412634
@@ -70,85 +70,85 @@ namespace ModFileCore.ModLoader.Core
 			{
 				using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
 				{
-					if (dllReferences.Length != 0)
+					if (DllReferences.Length != 0)
 					{
 						binaryWriter.Write("dllReferences");
-						BuildProperties.WriteList<string>(this.dllReferences, binaryWriter);
+						BuildProperties.WriteList<string>(this.DllReferences, binaryWriter);
 					}
-					if (modReferences.Length != 0)
+					if (ModReferences.Length != 0)
 					{
 						binaryWriter.Write("modReferences");
-						BuildProperties.WriteList<BuildProperties.ModReference>(this.modReferences, binaryWriter);
+						BuildProperties.WriteList<BuildProperties.ModReference>(this.ModReferences, binaryWriter);
 					}
-					if (weakReferences.Length != 0)
+					if (WeakReferences.Length != 0)
 					{
 						binaryWriter.Write("weakReferences");
-						BuildProperties.WriteList<BuildProperties.ModReference>(this.weakReferences, binaryWriter);
+						BuildProperties.WriteList<BuildProperties.ModReference>(this.WeakReferences, binaryWriter);
 					}
-					if (sortAfter.Length != 0)
+					if (SortAfter.Length != 0)
 					{
 						binaryWriter.Write("sortAfter");
-						BuildProperties.WriteList<string>(this.sortAfter, binaryWriter);
+						BuildProperties.WriteList<string>(this.SortAfter, binaryWriter);
 					}
-					if (sortBefore.Length != 0)
+					if (SortBefore.Length != 0)
 					{
 						binaryWriter.Write("sortBefore");
-						BuildProperties.WriteList<string>(this.sortBefore, binaryWriter);
+						BuildProperties.WriteList<string>(this.SortBefore, binaryWriter);
 					}
-					if (this.author.Length > 0)
+					if (this.Author.Length > 0)
 					{
 						binaryWriter.Write("author");
-						binaryWriter.Write(this.author);
+						binaryWriter.Write(this.Author);
 					}
 					binaryWriter.Write("version");
-					binaryWriter.Write(this.version.ToString());
-					if (this.displayName.Length > 0)
+					binaryWriter.Write(Version);
+					if (this.DisplayName.Length > 0)
 					{
 						binaryWriter.Write("displayName");
-						binaryWriter.Write(this.displayName);
+						binaryWriter.Write(this.DisplayName);
 					}
-					if (this.homepage.Length > 0)
+					if (this.Homepage.Length > 0)
 					{
 						binaryWriter.Write("homepage");
-						binaryWriter.Write(this.homepage);
+						binaryWriter.Write(this.Homepage);
 					}
-					if (this.description.Length > 0)
+					if (this.Description.Length > 0)
 					{
 						binaryWriter.Write("description");
-						binaryWriter.Write(this.description);
+						binaryWriter.Write(this.Description);
 					}
-					if (this.noCompile)
+					if (this.NoCompile)
 					{
 						binaryWriter.Write("noCompile");
 					}
-					if (!this.hideCode)
+					if (!this.HideCode)
 					{
 						binaryWriter.Write("!hideCode");
 					}
-					if (!this.hideResources)
+					if (!this.HideResources)
 					{
 						binaryWriter.Write("!hideResources");
 					}
-					if (this.includeSource)
+					if (this.IncludeSource)
 					{
 						binaryWriter.Write("includeSource");
 					}
-					if (this.includePDB)
+					if (this.IncludePdb)
 					{
 						binaryWriter.Write("includePDB");
 					}
-					if (this.eacPath.Length > 0)
+					if (this.EacPath.Length > 0)
 					{
 						binaryWriter.Write("eacPath");
-						binaryWriter.Write(this.eacPath);
+						binaryWriter.Write(this.EacPath);
 					}
-					if (this.side != ModReference.ModSide.Both)
+					if (this.Side != ModReference.ModSide.Both)
 					{
 						binaryWriter.Write("side");
-						binaryWriter.Write((byte)this.side);
+						binaryWriter.Write((byte)this.Side);
 					}
 					binaryWriter.Write("buildVersion");
-					binaryWriter.Write(this.buildVersion.ToString());
+					binaryWriter.Write(BuildVersion);
 					binaryWriter.Write("");
 				}
 				result = memoryStream.ToArray();
@@ -181,79 +181,79 @@ namespace ModFileCore.ModLoader.Core
 				{
 					if (text == "dllReferences")
 					{
-						buildProperties.dllReferences = BuildProperties.ReadList(binaryReader).ToArray<string>();
+						buildProperties.DllReferences = BuildProperties.ReadList(binaryReader).ToArray<string>();
 					}
 					if (text == "modReferences")
 					{
-						buildProperties.modReferences = BuildProperties.ReadList(binaryReader).Select(new Func<string, BuildProperties.ModReference>(BuildProperties.ModReference.Parse)).ToArray<BuildProperties.ModReference>();
+						buildProperties.ModReferences = BuildProperties.ReadList(binaryReader).Select(new Func<string, BuildProperties.ModReference>(BuildProperties.ModReference.Parse)).ToArray<BuildProperties.ModReference>();
 					}
 					if (text == "weakReferences")
 					{
-						buildProperties.weakReferences = BuildProperties.ReadList(binaryReader).Select(new Func<string, BuildProperties.ModReference>(BuildProperties.ModReference.Parse)).ToArray<BuildProperties.ModReference>();
+						buildProperties.WeakReferences = BuildProperties.ReadList(binaryReader).Select(new Func<string, BuildProperties.ModReference>(BuildProperties.ModReference.Parse)).ToArray<BuildProperties.ModReference>();
 					}
 					if (text == "sortAfter")
 					{
-						buildProperties.sortAfter = BuildProperties.ReadList(binaryReader).ToArray<string>();
+						buildProperties.SortAfter = BuildProperties.ReadList(binaryReader).ToArray<string>();
 					}
 					if (text == "sortBefore")
 					{
-						buildProperties.sortBefore = BuildProperties.ReadList(binaryReader).ToArray<string>();
+						buildProperties.SortBefore = BuildProperties.ReadList(binaryReader).ToArray<string>();
 					}
 					if (text == "author")
 					{
-						buildProperties.author = binaryReader.ReadString();
+						buildProperties.Author = binaryReader.ReadString();
 					}
 					if (text == "version")
 					{
-						buildProperties.version = new Version(binaryReader.ReadString());
+						buildProperties.Version = binaryReader.ReadString();
 					}
 					if (text == "displayName")
 					{
-						buildProperties.displayName = binaryReader.ReadString();
+						buildProperties.DisplayName = binaryReader.ReadString();
 					}
 					if (text == "homepage")
 					{
-						buildProperties.homepage = binaryReader.ReadString();
+						buildProperties.Homepage = binaryReader.ReadString();
 					}
 					if (text == "description")
 					{
-						buildProperties.description = binaryReader.ReadString();
+						buildProperties.Description = binaryReader.ReadString();
 					}
 					if (text == "noCompile")
 					{
-						buildProperties.noCompile = true;
+						buildProperties.NoCompile = true;
 					}
 					if (text == "!hideCode")
 					{
-						buildProperties.hideCode = false;
+						buildProperties.HideCode = false;
 					}
 					if (text == "!hideResources")
 					{
-						buildProperties.hideResources = false;
+						buildProperties.HideResources = false;
 					}
 					if (text == "includeSource")
 					{
-						buildProperties.includeSource = true;
+						buildProperties.IncludeSource = true;
 					}
 					if (text == "includePDB")
 					{
-						buildProperties.includePDB = true;
+						buildProperties.IncludePdb = true;
 					}
 					if (text == "eacPath")
 					{
-						buildProperties.eacPath = binaryReader.ReadString();
+						buildProperties.EacPath = binaryReader.ReadString();
 					}
 					if (text == "side")
 					{
-						buildProperties.side = (ModReference.ModSide)binaryReader.ReadByte();
+						buildProperties.Side = (ModReference.ModSide)binaryReader.ReadByte();
 					}
 					if (text == "beta")
 					{
-						buildProperties.beta = true;
+						buildProperties.Beta = true;
 					}
 					if (text == "buildVersion")
 					{
-						buildProperties.buildVersion = new Version(binaryReader.ReadString());
+						buildProperties.BuildVersion = binaryReader.ReadString();
 					}
 					text = binaryReader.ReadString();
 				}
@@ -266,62 +266,62 @@ namespace ModFileCore.ModLoader.Core
 		{
 			BuildProperties buildProperties = BuildProperties.ReadFromStream(src);
 			StringBuilder stringBuilder = new StringBuilder();
-			if (buildProperties.displayName.Length > 0)
+			if (buildProperties.DisplayName.Length > 0)
 			{
-				stringBuilder.AppendLine("displayName = " + buildProperties.displayName);
+				stringBuilder.AppendLine("displayName = " + buildProperties.DisplayName);
 			}
-			if (buildProperties.author.Length > 0)
+			if (buildProperties.Author.Length > 0)
 			{
-				stringBuilder.AppendLine("author = " + buildProperties.author);
+				stringBuilder.AppendLine("author = " + buildProperties.Author);
 			}
-			stringBuilder.AppendLine(string.Format("version = {0}", buildProperties.version));
-			if (buildProperties.homepage.Length > 0)
+			stringBuilder.AppendLine(string.Format("version = {0}", buildProperties.Version));
+			if (buildProperties.Homepage.Length > 0)
 			{
-				stringBuilder.AppendLine("homepage = " + buildProperties.homepage);
+				stringBuilder.AppendLine("homepage = " + buildProperties.Homepage);
 			}
-			if (buildProperties.dllReferences.Length != 0)
+			if (buildProperties.DllReferences.Length != 0)
 			{
-				stringBuilder.AppendLine("dllReferences = " + string.Join(", ", buildProperties.dllReferences));
+				stringBuilder.AppendLine("dllReferences = " + string.Join(", ", buildProperties.DllReferences));
 			}
-			if (buildProperties.modReferences.Length != 0)
+			if (buildProperties.ModReferences.Length != 0)
 			{
-				stringBuilder.AppendLine("modReferences = " + string.Join<BuildProperties.ModReference>(", ", buildProperties.modReferences));
+				stringBuilder.AppendLine("modReferences = " + string.Join<BuildProperties.ModReference>(", ", buildProperties.ModReferences));
 			}
-			if (buildProperties.weakReferences.Length != 0)
+			if (buildProperties.WeakReferences.Length != 0)
 			{
-				stringBuilder.AppendLine("weakReferences = " + string.Join<BuildProperties.ModReference>(", ", buildProperties.weakReferences));
+				stringBuilder.AppendLine("weakReferences = " + string.Join<BuildProperties.ModReference>(", ", buildProperties.WeakReferences));
 			}
-			if (buildProperties.noCompile)
+			if (buildProperties.NoCompile)
 			{
 				stringBuilder.AppendLine("noCompile = true");
 			}
-			if (buildProperties.hideCode)
+			if (buildProperties.HideCode)
 			{
 				stringBuilder.AppendLine("hideCode = true");
 			}
-			if (buildProperties.hideResources)
+			if (buildProperties.HideResources)
 			{
 				stringBuilder.AppendLine("hideResources = true");
 			}
-			if (buildProperties.includeSource)
+			if (buildProperties.IncludeSource)
 			{
 				stringBuilder.AppendLine("includeSource = true");
 			}
-			if (buildProperties.includePDB)
+			if (buildProperties.IncludePdb)
 			{
 				stringBuilder.AppendLine("includePDB = true");
 			}
-			if (buildProperties.side != ModReference.ModSide.Both)
+			if (buildProperties.Side != ModReference.ModSide.Both)
 			{
-				stringBuilder.AppendLine(string.Format("side = {0}", buildProperties.side));
+				stringBuilder.AppendLine(string.Format("side = {0}", buildProperties.Side));
 			}
-			if (buildProperties.sortAfter.Length != 0)
+			if (buildProperties.SortAfter.Length != 0)
 			{
-				stringBuilder.AppendLine("sortAfter = " + string.Join(", ", buildProperties.sortAfter));
+				stringBuilder.AppendLine("sortAfter = " + string.Join(", ", buildProperties.SortAfter));
 			}
-			if (buildProperties.sortBefore.Length != 0)
+			if (buildProperties.SortBefore.Length != 0)
 			{
-				stringBuilder.AppendLine("sortBefore = " + string.Join(", ", buildProperties.sortBefore));
+				stringBuilder.AppendLine("sortBefore = " + string.Join(", ", buildProperties.SortBefore));
 			}
 			byte[] bytes = Encoding.UTF8.GetBytes(stringBuilder.ToString());
 			dst.Write(bytes, 0, bytes.Length);
@@ -330,7 +330,7 @@ namespace ModFileCore.ModLoader.Core
 		// Token: 0x0600199C RID: 6556 RVA: 0x0041526C File Offset: 0x0041346C
 		internal bool ignoreFile(string resource)
 		{
-			return this.buildIgnores.Any((string fileMask) => this.FitsMask(resource, fileMask));
+			return this.BuildIgnores.Any((string fileMask) => this.FitsMask(resource, fileMask));
 		}
 
 		// Token: 0x0600199D RID: 6557 RVA: 0x004152A4 File Offset: 0x004134A4
@@ -339,88 +339,66 @@ namespace ModFileCore.ModLoader.Core
 			return new Regex("^" + Regex.Escape(fileMask.Replace(".", "__DOT__").Replace("*", "__STAR__").Replace("?", "__QM__")).Replace("__DOT__", "[.]").Replace("__STAR__", ".*").Replace("__QM__", ".") + "$", RegexOptions.IgnoreCase).IsMatch(fileName);
 		}
 
-		// Token: 0x04001615 RID: 5653
-		internal string[] dllReferences = new string[0];
+		internal string[] DllReferences = new string[0];
 
-		// Token: 0x04001616 RID: 5654
-		internal BuildProperties.ModReference[] modReferences = new BuildProperties.ModReference[0];
+		internal ModReference[] ModReferences = new ModReference[0];
 
-		// Token: 0x04001617 RID: 5655
-		internal BuildProperties.ModReference[] weakReferences = new BuildProperties.ModReference[0];
+		internal ModReference[] WeakReferences = new ModReference[0];
 
-		// Token: 0x04001618 RID: 5656
-		internal string[] sortAfter = new string[0];
+		internal string[] SortAfter = new string[0];
 
-		// Token: 0x04001619 RID: 5657
-		internal string[] sortBefore = new string[0];
+		internal string[] SortBefore = new string[0];
 
-		// Token: 0x0400161A RID: 5658
-		internal string[] buildIgnores = new string[0];
+		internal string[] BuildIgnores = new string[0];
 
-		// Token: 0x0400161B RID: 5659
-		internal string author = "";
+		internal string Author = "";
 
-		// Token: 0x0400161C RID: 5660
-		internal Version version = new Version(1, 0);
+		internal string Version = "1.0";
 
-		// Token: 0x0400161D RID: 5661
-		internal string displayName = "";
+		internal string DisplayName = "";
 
-		// Token: 0x0400161E RID: 5662
-		internal bool noCompile;
+		internal bool NoCompile;
 
-		// Token: 0x0400161F RID: 5663
-		internal bool hideCode;
+		internal bool HideCode;
+		
+		internal bool HideResources;
 
-		// Token: 0x04001620 RID: 5664
-		internal bool hideResources;
+		internal bool IncludeSource;
 
-		// Token: 0x04001621 RID: 5665
-		internal bool includeSource;
+		internal bool IncludePdb = true;
 
-		// Token: 0x04001622 RID: 5666
-		internal bool includePDB = true;
+		internal string EacPath = "";
 
-		// Token: 0x04001623 RID: 5667
-		internal string eacPath = "";
+		internal bool Beta = false;
 
-		// Token: 0x04001624 RID: 5668
-		internal bool beta;
+		internal string BuildVersion = TConstants.NewestTmodVersion.ToString();
 
-		// Token: 0x04001625 RID: 5669
-		internal Version buildVersion = DefaultConfig.ModLoaderVersion;
+		internal string Homepage = "";
 
-		// Token: 0x04001626 RID: 5670
-		internal string homepage = "";
+		internal string Description = "";
 
-		// Token: 0x04001627 RID: 5671
-		internal string description = "";
+		internal ModReference.ModSide Side;
 
-		// Token: 0x04001628 RID: 5672
-		internal ModReference.ModSide side;
-
-		// Token: 0x020004A6 RID: 1190
+		[JsonObject(MemberSerialization.Fields)]
 		public struct ModReference
 		{
-			// Token: 0x06002980 RID: 10624 RVA: 0x004902EE File Offset: 0x0048E4EE
-			public ModReference(string mod, Version target)
+			public ModReference(string mod, string target)
 			{
-				this.mod = mod;
-				this.target = target;
+				this.Mod = mod;
+				this.Target = target;
 			}
 
 			// Token: 0x06002981 RID: 10625 RVA: 0x004902FE File Offset: 0x0048E4FE
 			public override string ToString()
 			{
-				if (!(this.target == null))
+				if (!(this.Target == null))
 				{
-					return this.mod + "@" + this.target;
+					return this.Mod + "@" + this.Target;
 				}
-				return this.mod;
+				return this.Mod;
 			}
 
-			// Token: 0x06002982 RID: 10626 RVA: 0x0049032C File Offset: 0x0048E52C
-			public static BuildProperties.ModReference Parse(string spec)
+			public static ModReference Parse(string spec)
 			{
 				string[] array = spec.Split(new char[]
 				{
@@ -428,16 +406,16 @@ namespace ModFileCore.ModLoader.Core
 				});
 				if (array.Length == 1)
 				{
-					return new BuildProperties.ModReference(array[0], null);
+					return new ModReference(array[0], null);
 				}
 				if (array.Length > 2)
 				{
 					throw new Exception("Invalid mod reference: " + spec);
 				}
-				BuildProperties.ModReference result;
+				ModReference result;
 				try
 				{
-					result = new BuildProperties.ModReference(array[0], new Version(array[1]));
+					result = new ModReference(array[0], array[1]);
 				}
 				catch
 				{
@@ -446,11 +424,9 @@ namespace ModFileCore.ModLoader.Core
 				return result;
 			}
 
-			// Token: 0x0400416F RID: 16751
-			public string mod;
+			public string Mod;
 
-			// Token: 0x04004170 RID: 16752
-			public Version target;
+			public string Target;
 
 			public enum ModSide
 			{

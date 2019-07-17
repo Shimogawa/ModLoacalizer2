@@ -41,7 +41,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultConfig.cs" />
     <Compile Include="ModLoader\Core\BuildProperties.cs" />
     <Compile Include="ModLoader\Core\EntryReadStream.cs" />
     <Compile Include="ModLoader\Core\TConstants.cs" />
