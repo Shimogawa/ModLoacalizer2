@@ -362,12 +362,27 @@ namespace ModFileCore.ModLoader.Core
 			fileTable = null;
 		}
 
-		//		public void AddFile(string fileName, byte[] data)
-		//		{
-		//			byte[] dataCopy = new byte[data.Length];
-		//			data.CopyTo(dataCopy, 0);
-		//			files[Sanitize(fileName)] = dataCopy;
-		//		}
+		public void AddFile(string fileName, byte[] data, bool copy = false)
+		{
+            if (copy)
+            {
+                byte[] dataCopy = new byte[data.Length];
+                data.CopyTo(dataCopy, 0);
+                data = dataCopy;
+            }
+            string nfname = Sanitize(fileName);
+            if (files.ContainsKey(nfname))
+                throw new ArgumentException("File already exists. Use replace.", nameof(fileName));
+            int oldLen = data.Length;
+            if (data.Length > 1024 && ShouldCompress(fileName) && fileMLVersion >= TConstants.NewTmodVersion)
+            {
+                data = Compress(data);
+            }
+            var fe = new FileEntry(nfname, -1, oldLen, data.Length);
+            fe.OriginalData = data;
+            files[nfname] = fe;
+            fileTable = null;
+		}
 
 		private static bool ShouldCompress(string fileName)
 		{
@@ -539,6 +554,10 @@ namespace ModFileCore.ModLoader.Core
 
 			public int CompressedLength { get; internal set; }
 
+            /// <summary>
+            /// Gets or sets the original data (after compression if applicable).
+            /// </summary>
+            /// <value>The original data.</value>
 			public byte[] OriginalData { get; internal set; }
 
 			public bool IsCompressed => Length != CompressedLength;
